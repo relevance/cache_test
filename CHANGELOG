@@ -1,0 +1,14 @@
+*0.2* (October 17th, 2006)
+
+* overrides default page caching method to record page cached and
+  expired and use that information instead of going to the filesystem
+  to see if cached file exists or not.
+
+* add unit testing
+
+* add method for action and fragment caching
+
+*0.1* (October 5th, 2006)
+
+* first plugin release
+

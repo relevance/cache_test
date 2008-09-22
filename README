@@ -1,0 +1,124 @@
+= Cache Test Plugin
+
+This plugin adds assertions in test cases to check the caching 
+logic of your application.
+
+
+== 1. Installation
+
+Unpack into the vendor/plugin and that should be it.
+
+== 2. Usage
+
+=== Testing page caching
+
+First create an integration test. Then, to test caching of the
+"/pages/about" and "/pages/contact" pages, add a method like this:
+
+  def test_caching
+    assert_cache_pages("/pages/about", "/pages/contact")
+  end
+
+The assert_cache_pages method will
+
+- first make sure that the urls are not cached,
+- execute a get on each request,
+- assert that the corresponding cache files have been created.
+
+You can also give a block to the assert_cache_pages method. Instead
+of executing a get on each url, it will yield the urls. For example:
+
+  def test_caching
+    assert_cache_pages("/pages/about", "/pages/contact") do |url_about, url_contact|
+      post url_about
+      post url_contact
+    end
+  end
+
+=== Testing expiration of pages
+
+You will also certainly want (and that's really the most interesting
+part) to check if your cached pages expires when the user is doing
+some action. For that, here is the assert_expire method:
+
+  def test_expiring
+    assert_expire_pages("/news/list", "/news/show/1") do |*urls|
+      post "/news/delete/1"
+    end
+  end
+
+Here the assert_expire_pages method will 
+
+- check that the urls are cached,
+- execute the post request,
+- and assert that the urls are no more cached.
+
+This is great for testing your cache sweepers logic.
+
+=== Testing action caching
+
+To test caching of the "bar" action of the foo "controller"
+in an integration test, do
+
+  assert_cache_actions(:controller => "foo", :action => "bar") do
+    get "/foo/bar"
+  end
+
+The assert_cache_actions method will
+- first make sure that the actions are not cached,
+- yield the given block
+- assert that the corresponding action fragment have been stored.
+
+=== Testing expiration of actions
+
+To check that some actions are expired, use the assert_expire_actions method:
+
+  assert_expire_actions(:controller => "foo", :action => "bar") do |*urls|
+    post "/foo/expire_cache"
+  end
+
+Here the assert_expire_actions method will 
+
+- check that the actions fragments are cached,
+- execute the post request,
+- and assert that the fragments are no more cached.
+
+In functional test, there can be only one controller, so you are
+not required to give the :controller option and if they are no
+parameters to the action, you can simply call 
+
+  assert_cache_actions(:foo, :bar) do
+    get :bar
+    get :foo
+  end
+
+== Testing fragments caching
+
+To check that your fragments are cached when doing some action,
+do
+
+  assert_cache_fragments(:controller => "foo", :action => "bar", :action_suffix => "baz") do
+    get "/foo/bar"
+  end
+
+== Testing expiration of fragments
+
+To check that your fragments are expired when doing some action,
+do
+
+  assert_expire_fragments(:controller => "foo", :action => "bar", :action_suffix => "baz") do
+    get "/foo/expire"
+  end
+
+In functional test, your not required to give the :controller option.
+
+== 3. License
+
+This plugin is licensed under the MIT license. Complete license text
+is included in the MIT-LICENSE[link:files/MIT-LICENSE.html] file.
+
+== 4. Author
+
+This plugin was created by Damien Merenne <dam@cosinux.org> and is
+located at http://blog.cosinux.org/pages/page-cache-test.
+
