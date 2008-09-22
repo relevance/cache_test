@@ -119,6 +119,8 @@ is included in the MIT-LICENSE[link:files/MIT-LICENSE.html] file.
 
 == 4. Author
 
-This plugin was created by Damien Merenne <dam@cosinux.org> and is
-located at http://blog.cosinux.org/pages/page-cache-test.
+This plugin was created by Damien Merenne <dam@cosinux.org> and first 
+released at http://blog.cosinux.org/pages/page-cache-test.  
 
+This plugin was updated to work with Rails 2.1.1 by Jason Rudolph.  The
+updated version is available at https://github.com/relevance/cache_test.

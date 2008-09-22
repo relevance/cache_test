@@ -9,7 +9,7 @@ module Cosinux
     # This fragment store remembers the fragments that have been 
     # cached or deleted so that we can use it to check if
     # caching or expiring of fragment was done or not.
-    class TestStore < ActionController::Caching::Fragments::MemoryStore #:nodoc:
+    class TestStore < ActiveSupport::Cache::MemoryStore #:nodoc:
       attr_reader :written, :deleted, :deleted_matchers
       
       def initialize
@@ -51,7 +51,7 @@ module Cosinux
     
     def self.configure #:nodoc:
       ActionController::Base.perform_caching = true
-      ActionController::Base.fragment_cache_store = TestStore.new
+      ActionController::Base.cache_store = TestStore.new
       
       Test::Unit::TestCase.class_eval do
         include Assertions
@@ -123,7 +123,7 @@ module Cosinux
         # in integration test, we need the know the controller
         check_options_has_controller(names) if self.is_a?(ActionController::IntegrationTest)
         
-        fragment_cache_store.reset
+        cache_store.reset
         
         yield *names
         
@@ -132,7 +132,7 @@ module Cosinux
         
         names.each do |name|
           assert_block("#{name.inspect} is not cached after executing block") do
-            fragment_cache_store.written?(@controller.fragment_cache_key(name))
+            cache_store.written?(@controller.fragment_cache_key(name))
           end
         end
       end
@@ -141,7 +141,7 @@ module Cosinux
       def assert_expire_fragments(*names)
         check_options_has_controller(names) if self.is_a?(ActionController::IntegrationTest)
         
-        fragment_cache_store.reset
+        cache_store.reset
         
         yield *names
 
@@ -149,7 +149,7 @@ module Cosinux
         
         names.each do |name|
           assert_block("#{name.inspect} is cached after executing block") do
-            fragment_cache_store.deleted?(@controller.fragment_cache_key(name))
+            cache_store.deleted?(@controller.fragment_cache_key(name))
           end
         end
       end
@@ -158,7 +158,7 @@ module Cosinux
       def assert_cache_actions(*actions)
         check_options_has_controller(actions) if self.is_a?(ActionController::IntegrationTest)
         
-        fragment_cache_store.reset
+        cache_store.reset
         
         yield *actions
        
@@ -167,7 +167,7 @@ module Cosinux
         actions.each do |action|
           action = { :action => action } unless action.is_a?(Hash)
           assert_block("#{action.inspect} is not cached after executing block") do
-            fragment_cache_store.written?(@controller.fragment_cache_key(action))
+            cache_store.written?(@controller.fragment_cache_key(action))
           end
         end
       end
@@ -176,7 +176,7 @@ module Cosinux
       def assert_expire_actions(*actions)
         check_options_has_controller(actions) if self.is_a?(ActionController::IntegrationTest)
         
-        fragment_cache_store.reset
+        cache_store.reset
         
         yield *actions
         
@@ -185,14 +185,14 @@ module Cosinux
         actions.each do |action|
           action = { :action => action } unless action.is_a?(Hash)
           assert_block("#{action.inspect} is cached after executing block") do
-            fragment_cache_store.deleted?(@controller.fragment_cache_key(action))
+            cache_store.deleted?(@controller.fragment_cache_key(action))
           end
         end
       end
 
       private
-      def fragment_cache_store
-        ActionController::Base.fragment_cache_store
+      def cache_store
+        ActionController::Base.cache_store
       end
       
       def check_options_has_controller(options)

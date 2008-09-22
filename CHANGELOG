@@ -1,3 +1,8 @@
+*0.2.1* (September 22nd, 2008)
+
+* forked from http://www.cosinux.org/~dam/projects/page-cache-test/cache_test-0.2.tar.bz2
+* updated to work with Rails 2.1.1
+
 *0.2* (October 17th, 2006)
 
 * overrides default page caching method to record page cached and
